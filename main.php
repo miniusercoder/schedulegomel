@@ -32,7 +32,7 @@ if (!file_exists("$root/database/profiles/$id.json")) {
         'v' => 0
     ];
     $result = file_put_contents("$root/database/profiles/$id.json", json_encode($user));
-    if (!$result) $botApi->sendMessage("Произошла ошибка во время создания профиля\r\nСвяжитесь с [id280790787|администратором]");
+    if (!$result) $botApi->error("Произошла ошибка во время создания профиля\r\nСвяжитесь с [id280790787|администратором]");
     $botApi->sendMessage("Профиль был успешно создан.\r\nВы можете начать получать расписание траспорта прямо сейчас", "default");
     die();
 }
@@ -105,14 +105,18 @@ if ($botApi->getProfile("status") != "") {
                 }
             }
         }
-        $keyboard[0][0]["action"]["type"] = "text";
-        $keyboard[0][0]["action"]["label"] = $route->EndStopB . " - " . $route->EndStopA;
-        $keyboard[0][0]["action"]["payload"] = json_encode(["action" => "AB"]);
-        $keyboard[0][0]["color"] = "default";
-        $keyboard[1][0]["action"]["type"] = "text";
-        $keyboard[1][0]["action"]["label"] = $route->EndStopA . " - " . $route->EndStopB;
-        $keyboard[1][0]["action"]["payload"] = json_encode(["action" => "BA"]);
-        $keyboard[1][0]["color"] = "default";
+        $keyboard = [];
+        $button[0]["action"]["type"] = "text";
+        $button[0]["action"]["label"] = $route->NameA;
+        $button[0]["action"]["payload"] = json_encode(["action" => "AB"]);
+        $button[0]["color"] = "default";
+        if ($route->NameA !== null)
+            array_push($keyboard, $button);
+        $button[0]["action"]["type"] = "text";
+        $button[0]["action"]["label"] = $route->NameB;
+        $button[0]["action"]["payload"] = json_encode(["action" => "BA"]);
+        $button[0]["color"] = "default";
+        array_push($keyboard, $button);
         $botApi->sendMessage("Выберите направление движения", "custom", $keyboard);
         $botApi->setProfile("status", "waitDirection");
         $botApi->setProfile("r", $text[0]);
