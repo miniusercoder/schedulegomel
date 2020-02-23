@@ -16,7 +16,7 @@ include "$root/core/bot.api.class.php";
 include "$root/core/gopt.api.class.php";
 
 $vkApi = new vkApi($access_token, "5.95");
-$gopt = new goptApi();
+$gopt = new goptApi("https://gopt.by/gomel", "gomel");
 $botApi = new botApi($vkApi, $peer, $gopt);
 do {
     $init = $gopt->init();
@@ -163,7 +163,7 @@ if ($botApi->getProfile("status") != "") {
                         $times[0] = $item->Hour . ':' . $minute;
                         $message = "Ближайший рейс в " . $times[0];
                         if ($times[0] == "")
-                            $botApi->sendMessage("Сегодня больше не будет рейсов");
+                            $botApi->sendMessage("Сегодня больше не будет рейсов", "default");
                         else
                             $botApi->sendMessage($message, "default");
                         $botApi->setProfile("status", "");
@@ -178,18 +178,17 @@ if ($botApi->getProfile("status") != "") {
                 break;
             }
         }
+        $message = "Ближайший рейс в " . $times[0];
         if ($times[0] == "")
-            $botApi->sendMessage("Сегодня больше не будет рейсов");
+            $botApi->sendMessage("Сегодня больше не будет рейсов", "default");
         else
-            $message = "Ближайший рейс в " . $times[0];
-        $botApi->sendMessage($message, "default");
+            $botApi->sendMessage($message, "default");
     } elseif ($status == "waitDirection") {
         $botApi->sendMessage("Выберите направление движения");
         die();
     }
     $botApi->setProfile("status", "");
     die();
-
 }
 
 if ($peer - 2000000000 < 0)
