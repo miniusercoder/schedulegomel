@@ -116,7 +116,8 @@ if ($botApi->getProfile("status") != "") {
         $button[0]["action"]["label"] = $route->NameB;
         $button[0]["action"]["payload"] = json_encode(["action" => "BA"]);
         $button[0]["color"] = "default";
-        array_push($keyboard, $button);
+        if ($route->NameB !== null)
+            array_push($keyboard, $button);
         $botApi->sendMessage("Выберите направление движения", "custom", $keyboard);
         $botApi->setProfile("status", "waitDirection");
         $botApi->setProfile("r", $text[0]);
