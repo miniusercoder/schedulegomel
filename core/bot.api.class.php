@@ -77,7 +77,8 @@ class botApi
         $data['attachment'] = $attachment;
         $this->vkApi->method("messages.send", $data);
     }
-
+/// 108766
+/// 58631
     function getProfile($item)
     {
         $profile = json_decode(file_get_contents("database/profiles/{$this->peer}.json"));

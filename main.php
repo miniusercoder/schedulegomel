@@ -15,7 +15,7 @@ include "$root/core/vk.api.class.php";
 include "$root/core/bot.api.class.php";
 include "$root/core/gopt.api.class.php";
 
-$vkApi = new vkApi($access_token, "5.95");
+$vkApi = new vkApi($access_token, $v);
 $gopt = new goptApi("https://gopt.by/gomel", "gomel");
 $botApi = new botApi($vkApi, $peer, $gopt);
 do {
@@ -137,7 +137,6 @@ if ($botApi->getProfile("status") != "") {
             $stops = $route->StopsB;
             $stopList = $route->StopNamesB;
         }
-        $message = "";
         $stop_id = 0;
         foreach ($stopList as $key => $item) {
             if ($key + 1 == (int)$text[0]) {
@@ -148,7 +147,28 @@ if ($botApi->getProfile("status") != "") {
             $botApi->sendMessage("Введите номер остановки", "cancel");
             die();
         }
-        $message .= $key + 1 . ". " . $item . PHP_EOL;
+        if ($gopt->saltAct == "+")
+            $hash = $gopt->salt + $stop_id;
+        elseif ($gopt->saltAct == "^")
+            $hash = $gopt->salt ^ $stop_id;
+        $scoreboard = $gopt->method("Data/Scoreboard", [
+            "s" => $stop_id,
+            "v" => $hash
+        ])->Routes;
+        if ($botApi->getProfile("tt") == "bus")
+            $type = "А";
+        elseif ($botApi->getProfile("tt") == "trolleybus")
+            $type = "Т";
+        elseif ($botApi->getProfile("tt") == "routetaxi")
+            $type = "М";
+        foreach ($scoreboard as $item) {
+            if ($item->Type == $type && $item->Number == $botApi->getProfile("r")) {
+                $message = "Ближайший рейс через " . $item->Info[0] . " мин" . PHP_EOL;
+                $message .= "Следующий рейс через " . $item->Info[1] . " мин";
+                $botApi->sendMessage($message, "default");
+                die();
+            }
+        }
         $schedule = $gopt->method("Data/Schedule", [
             "s" => $stop_id,
             "d" => $d,
