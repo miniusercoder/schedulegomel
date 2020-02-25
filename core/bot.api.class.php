@@ -58,6 +58,28 @@ class botApi
                 $keyboard["buttons"][2][0]["action"]["label"] = "Маршрутка";
                 $keyboard["buttons"][2][0]["action"]["payload"] = json_encode(["action" => "routetaxi"]);
                 $keyboard["buttons"][2][0]["color"] = "default";
+                $keyboard["buttons"][3][0]["action"]["type"] = "text";
+                $keyboard["buttons"][3][0]["action"]["label"] = "Сохранённые маршруты";
+                $keyboard["buttons"][3][0]["action"]["payload"] = json_encode(["action" => "saveList"]);
+                $keyboard["buttons"][3][0]["color"] = "primary";
+            } elseif ($keyboard_type == "save") {
+                $keyboard["buttons"][0][0]["action"]["type"] = "text";
+                $keyboard["buttons"][0][0]["action"]["label"] = "Сохранить этот маршрут";
+                $keyboard["buttons"][0][0]["action"]["payload"] = json_encode(["action" => "save"]);
+                $keyboard["buttons"][0][0]["color"] = "positive";
+                $keyboard["buttons"][1][0]["action"]["type"] = "text";
+                $keyboard["buttons"][1][0]["action"]["label"] = "Отмена";
+                $keyboard["buttons"][1][0]["action"]["payload"] = json_encode(["action" => "cancel"]);
+                $keyboard["buttons"][1][0]["color"] = "negative";
+            } elseif ($keyboard_type == "delete") {
+                $keyboard["buttons"][0][0]["action"]["type"] = "text";
+                $keyboard["buttons"][0][0]["action"]["label"] = "Удалить этот маршрут";
+                $keyboard["buttons"][0][0]["action"]["payload"] = json_encode(["action" => "delete"]);
+                $keyboard["buttons"][0][0]["color"] = "secondary";
+                $keyboard["buttons"][1][0]["action"]["type"] = "text";
+                $keyboard["buttons"][1][0]["action"]["label"] = "Отмена";
+                $keyboard["buttons"][1][0]["action"]["payload"] = json_encode(["action" => "cancel"]);
+                $keyboard["buttons"][1][0]["color"] = "negative";
             } elseif ($keyboard_type == "custom") {
                 $keyboard['buttons'] = $custom_keyboard;
             } elseif ($keyboard_type == "cancel") {
