@@ -102,6 +102,30 @@ if (isset($data->object->payload)) {
             array_push($saved, $route);
             $botApi->setProfile("favourites", $saved);
             $botApi->sendMessage("Вы успешно сохранили маршрут", "default");
+        } elseif ($payload == "routes") {
+            $s = $botApi->getProfile("s");
+            if ($gopt->saltAct == "+")
+                $hash = $gopt->salt + $s;
+            elseif ($gopt->saltAct == "^")
+                $hash = $gopt->salt ^ $s;
+            $scoreboard = $gopt->method("Data/Scoreboard", [
+                "s" => $s,
+                "v" => $hash
+            ])->Routes;
+            $message = "Ближайшие рейсы на остановке: \r\n\r\n";
+            $count = 0;
+            foreach ($scoreboard as $route) {
+                $message .= $route->Type;
+                $message .= $route->Number;
+                $message .= "&#8195;" . $route->EndStop;
+                $message .= "&#8195;Ближ: " . $route->Info[0];
+                $message .= "\r\n";
+                if (++$count % 15 == 0) {
+                    $botApi->sendMessage($message, "default");
+                    $message = "";
+                }
+            }
+            $botApi->sendMessage($message, "default");
         } elseif ($payload == "saveList") {
             $saved = $botApi->getProfile("favourites");
             if (count($saved) == 0) {
@@ -138,15 +162,16 @@ if (isset($data->object->payload)) {
         } elseif ($payload == "savedRoute") {
             $saved = (array)$botApi->getProfile("favourites");
             foreach ($saved as $key => $item) {
-                $stop_id = $botApi->getProfile("s");
-                $d = $botApi->getProfile("d");
-                $tt = $botApi->getProfile("tt");
-                $r = $botApi->getProfile("r");
+                $stop_id = $item->s;
+                $d = $item->d;
+                $tt = $item->tt;
+                $r = $item->r;
                 $name = implode(" ", $text);
                 $name = mb_substr($name, 0, 39);
                 if (substr($name, strlen($name) - 1, 1) != ")")
                     $name .= ")";
                 if ($item->name == $name) {
+                    $botApi->setProfile("s", $stop_id);
                     $botApi->setProfile("status", $key);
                     if ($gopt->saltAct == "+")
                         $hash = $gopt->salt + $stop_id;
@@ -208,7 +233,7 @@ if (isset($data->object->payload)) {
                     if ($times[0] == "")
                         $botApi->sendMessage("Сегодня больше не будет рейсов", "delete");
                     else
-                        $botApi->sendMessage($message, "default");
+                        $botApi->sendMessage($message, "delete");
                     die();
                 }
             }
