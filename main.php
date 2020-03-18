@@ -6,9 +6,9 @@ include "$root/config/vars.php";
 if ($data->type == "confirmation") die($confirmation);
 if ($data->secret != $secret) die("Key error");
 echo("ok");
-$id = $data->object->from_id;
-$peer = $data->object->peer_id;
-$text = $data->object->text;
+$id = $data->object->message->from_id;
+$peer = $data->object->message->peer_id;
+$text = $data->object->message->text;
 $text = explode(" ", $text);
 
 include "$root/core/vk.api.class.php";
@@ -40,9 +40,9 @@ if (!file_exists("$root/database/profiles/$id.json")) {
     die();
 }
 
-if (isset($data->object->payload)) {
-    if (isset(json_decode($data->object->payload)->action)) {
-        $payload = json_decode($data->object->payload)->action;
+if (isset($data->object->message->payload)) {
+    if (isset(json_decode($data->object->message->payload)->action)) {
+        $payload = json_decode($data->object->message->payload)->action;
         if ($payload == "bus" or $payload == "trolleybus" or $payload == "routetaxi") {
             $routes = $gopt->method("Data/routeList", ["tt" => $payload])->Routes;
             $message = "";
