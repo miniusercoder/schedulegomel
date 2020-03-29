@@ -118,6 +118,12 @@ if (isset($data->object->message->payload)) {
                 $message .= $route->Type;
                 $message .= $route->Number;
                 $message .= "&#8195;" . $route->EndStop;
+                if ($route->Info[0] == "A")
+                    $route->Info[0] = "Приб.";
+                elseif ($route->Info[0] == "D")
+                    $route->Info[0] = "Приб.";
+                elseif ($route->Info[0] != "-")
+                    $route->Info[0] .= " мин";
                 $message .= "&#8195;Ближ: " . $route->Info[0];
                 $message .= "\r\n";
                 if (++$count % 15 == 0) {
@@ -189,8 +195,21 @@ if (isset($data->object->message->payload)) {
                         $type = "М";
                     foreach ($scoreboard as $value) {
                         if ($value->Type == $type && $value->Number == $r) {
-                            $message = "Ближайший рейс через " . $value->Info[0] . " мин" . PHP_EOL;
-                            $message .= "Следующий рейс через " . $value->Info[1] . " мин";
+                            if ($value->Info[0] == "A")
+                                $value->Info[0] = "Приб.";
+                            elseif ($value->Info[0] == "D")
+                                $value->Info[0] = "Приб.";
+                            elseif ($value->Info[0] != "-")
+                                $value->Info[0] .= " мин";
+
+                            if ($value->Info[1] == "A")
+                                $value->Info[1] = "Задерж.";
+                            elseif ($value->Info[1] == "D")
+                                $value->Info[1] = "Задерж.";
+                            elseif ($value->Info[1] != "-")
+                                $value->Info[1] .= " мин";
+                            $message = "Ближайший рейс через " . $value->Info[0] . PHP_EOL;
+                            $message .= "Следующий рейс через " . $value->Info[1];
                             $botApi->sendMessage($message, "delete");
                             die();
                         }
@@ -348,8 +367,20 @@ if ($botApi->getProfile("status") != "") {
             $type = "М";
         foreach ($scoreboard as $item) {
             if ($item->Type == $type && $item->Number == $botApi->getProfile("r")) {
-                $message = "Ближайший рейс через " . $item->Info[0] . " мин" . PHP_EOL;
-                $message .= "Следующий рейс через " . $item->Info[1] . " мин";
+                if ($item->Info[0] == "A")
+                    $item->Info[0] = "Приб.";
+                elseif ($item->Info[0] == "D")
+                    $item->Info[0] = "Приб.";
+                else
+                    $item->Info[0] .= " мин";
+                if ($item->Info[1] == "A")
+                    $item->Info[1] = "Задерж.";
+                elseif ($item->Info[1] == "D")
+                    $item->Info[1] = "Задерж.";
+                else
+                    $item->Info[1] .= " мин";
+                $message = "Ближайший рейс через " . $item->Info[0] . PHP_EOL;
+                $message .= "Следующий рейс через " . $item->Info[1];
                 $botApi->sendMessage($message, "save");
                 die();
             }
@@ -403,4 +434,3 @@ if ($botApi->getProfile("status") != "") {
 
 if ($peer - 2000000000 < 0)
     $botApi->error("Я не знаю такой команды, воспользуйтесь кнопками ниже");
-
