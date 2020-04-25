@@ -18,9 +18,6 @@ include "$root/core/gopt.api.class.php";
 $vkApi = new vkApi($access_token, $v);
 $gopt = new goptApi("https://gopt.by/gomel", "gomel");
 $botApi = new botApi($vkApi, $peer, $gopt);
-do {
-    $init = $gopt->init();
-} while (!$init);
 
 if (!file_exists("$root/database/profiles/$id.json")) {
     $user = [
@@ -103,6 +100,7 @@ if (isset($data->object->message->payload)) {
             $botApi->setProfile("favourites", $saved);
             $botApi->sendMessage("Вы успешно сохранили маршрут", "default");
         } elseif ($payload == "routes") {
+            $gopt->init();
             $s = $botApi->getProfile("s");
             if ($gopt->saltAct == "+")
                 $hash = $gopt->salt + $s;
@@ -166,6 +164,7 @@ if (isset($data->object->message->payload)) {
             $botApi->setProfile("status", "");
             $botApi->sendMessage("Маршрут успешно удалён", "default");
         } elseif ($payload == "savedRoute") {
+            $gopt->init();
             $saved = (array)$botApi->getProfile("favourites");
             foreach ($saved as $key => $item) {
                 $stop_id = $item->s;
