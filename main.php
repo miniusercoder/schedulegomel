@@ -17,7 +17,7 @@ include "$root/core/gopt.api.class.php";
 
 $vkApi = new vkApi($access_token, $v);
 $gopt = new goptApi("https://gopt.by/gomel", "gomel");
-$botApi = new botApi($vkApi, $peer, $gopt);
+$botApi = new botApi($vkApi, $peer);
 
 if (!file_exists("$root/database/profiles/$id.json")) {
     $user = [

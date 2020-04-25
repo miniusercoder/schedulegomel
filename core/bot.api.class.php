@@ -4,20 +4,17 @@ class botApi
 {
     private $vkApi = null;
     private $peer = 0;
-    private $gopt = null;
 
     /**
      * botApi constructor.
      *
      * @param object $vkApi Экземпляр класса vkApi
      * @param int $peer_id ID беседы (пользователя)
-     * @param object $gopt
      */
-    function __construct(object $vkApi, int $peer_id, object $gopt)
+    function __construct(object $vkApi, int $peer_id)
     {
         $this->vkApi = $vkApi;
         $this->peer = $peer_id;
-        $this->gopt = $gopt;
     }
 
 
@@ -67,27 +64,11 @@ class botApi
                 $keyboard["buttons"][0][0]["action"]["label"] = "Сохранить этот маршрут";
                 $keyboard["buttons"][0][0]["action"]["payload"] = json_encode(["action" => "save"]);
                 $keyboard["buttons"][0][0]["color"] = "positive";
-                $keyboard["buttons"][1][0]["action"]["type"] = "text";
-                $keyboard["buttons"][1][0]["action"]["label"] = "Просмотр всех рейсов на остановке";
-                $keyboard["buttons"][1][0]["action"]["payload"] = json_encode(["action" => "routes"]);
-                $keyboard["buttons"][1][0]["color"] = "primary";
-                $keyboard["buttons"][2][0]["action"]["type"] = "text";
-                $keyboard["buttons"][2][0]["action"]["label"] = "Отмена";
-                $keyboard["buttons"][2][0]["action"]["payload"] = json_encode(["action" => "cancel"]);
-                $keyboard["buttons"][2][0]["color"] = "negative";
             } elseif ($keyboard_type == "delete") {
                 $keyboard["buttons"][0][0]["action"]["type"] = "text";
                 $keyboard["buttons"][0][0]["action"]["label"] = "Удалить этот маршрут";
                 $keyboard["buttons"][0][0]["action"]["payload"] = json_encode(["action" => "delete"]);
                 $keyboard["buttons"][0][0]["color"] = "secondary";
-                $keyboard["buttons"][1][0]["action"]["type"] = "text";
-                $keyboard["buttons"][1][0]["action"]["label"] = "Просмотр всех рейсов на остановке";
-                $keyboard["buttons"][1][0]["action"]["payload"] = json_encode(["action" => "routes"]);
-                $keyboard["buttons"][1][0]["color"] = "primary";
-                $keyboard["buttons"][2][0]["action"]["type"] = "text";
-                $keyboard["buttons"][2][0]["action"]["label"] = "Отмена";
-                $keyboard["buttons"][2][0]["action"]["payload"] = json_encode(["action" => "cancel"]);
-                $keyboard["buttons"][2][0]["color"] = "negative";
             } elseif ($keyboard_type == "custom") {
                 $keyboard['buttons'] = $custom_keyboard;
             } elseif ($keyboard_type == "cancel") {
@@ -95,6 +76,16 @@ class botApi
                 $keyboard["buttons"][0][0]["action"]["label"] = "Отмена";
                 $keyboard["buttons"][0][0]["action"]["payload"] = json_encode(["action" => "cancel"]);
                 $keyboard["buttons"][0][0]["color"] = "negative";
+            }
+            if ($keyboard_type == "save" || $keyboard_type == "delete") {
+                $keyboard["buttons"][1][0]["action"]["type"] = "text";
+                $keyboard["buttons"][1][0]["action"]["label"] = "Просмотр всех рейсов на остановке";
+                $keyboard["buttons"][1][0]["action"]["payload"] = json_encode(["action" => "routes"]);
+                $keyboard["buttons"][1][0]["color"] = "primary";
+                $keyboard["buttons"][2][0]["action"]["type"] = "text";
+                $keyboard["buttons"][2][0]["action"]["label"] = "Отмена";
+                $keyboard["buttons"][2][0]["action"]["payload"] = json_encode(["action" => "cancel"]);
+                $keyboard["buttons"][2][0]["color"] = "negative";
             }
             $data["keyboard"] = json_encode($keyboard, JSON_UNESCAPED_UNICODE);
         }
@@ -107,8 +98,7 @@ class botApi
         $data['attachment'] = $attachment;
         $this->vkApi->method("messages.send", $data);
     }
-/// 108766
-/// 58631
+
     function getProfile($item)
     {
         $profile = json_decode(file_get_contents("database/profiles/{$this->peer}.json"));
@@ -120,20 +110,5 @@ class botApi
         $profile = json_decode(file_get_contents("database/profiles/{$this->peer}.json"));
         $profile->$item = $value;
         file_put_contents("database/profiles/{$this->peer}.json", json_encode($profile));
-    }
-
-    /**
-     * Получает информацию о пользователе vk
-     *
-     * @param int $user_id ID пользователя
-     * @param string $name_case Падеж имени
-     * @return object Результат
-     */
-    function getUser(int $user_id, string $name_case = "nom")
-    {
-        return $this->vkApi->method("users.get", [
-            "name_case" => $name_case,
-            "user_ids" => $user_id
-        ])->response[0];
     }
 }
