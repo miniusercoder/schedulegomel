@@ -5,6 +5,7 @@ include "$root/config/vars.php";
 
 if ($data->type == "confirmation") die($confirmation);
 if ($data->secret != $secret) die("Key error");
+http_response_code(200);
 echo("ok");
 $id = $data->object->message->from_id;
 $peer = $data->object->message->peer_id;
@@ -17,6 +18,7 @@ include "$root/core/gopt.api.class.php";
 
 $vkApi = new vkApi($access_token, $v);
 $gopt = new goptApi("https://gopt.by/gomel", "gomel");
+$gopt->init();
 $botApi = new botApi($vkApi, $peer);
 
 if (!file_exists("$root/database/profiles/$id.json")) {
@@ -164,7 +166,6 @@ if (isset($data->object->message->payload)) {
             $botApi->setProfile("status", "");
             $botApi->sendMessage("Маршрут успешно удалён", "default");
         } elseif ($payload == "savedRoute") {
-            $gopt->init();
             $saved = (array)$botApi->getProfile("favourites");
             foreach ($saved as $key => $item) {
                 $stop_id = $item->s;
@@ -176,6 +177,7 @@ if (isset($data->object->message->payload)) {
                 if (substr($name, strlen($name) - 1, 1) != ")")
                     $name .= ")";
                 if ($item->name == $name) {
+                    $gopt->init();
                     $botApi->setProfile("s", $stop_id);
                     $botApi->setProfile("status", $key);
                     if ($gopt->saltAct == "+")
@@ -349,6 +351,7 @@ if ($botApi->getProfile("status") != "") {
             $botApi->sendMessage("Введите номер остановки", "cancel");
             die();
         }
+        $gopt->init();
         $botApi->setProfile("s", $stop_id);
         if ($gopt->saltAct == "+")
             $hash = $gopt->salt + $stop_id;
