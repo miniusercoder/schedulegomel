@@ -12,7 +12,7 @@ class vkApi
      * @param string $access_token Access token группы
      * @param string $v Версия vk api
      */
-    function __construct(string $access_token, $v = "5.95")
+    function __construct(string $access_token, string $v = "5.95")
     {
         $this->access = $access_token;
         $this->v = $v;
